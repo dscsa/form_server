@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style type="text/css">
+  
+  label {
+    display: block;
+    padding-left: 15px;
+    text-indent: -15px;
+  }
+  
+  .supplies-checkbox-input,.pharmacy-checkbox-input {
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin:0;
+    vertical-align: bottom;
+    position: relative;
+    top: -1px;
+  }
+  
+  #manual_pharmacy_name, #store_pharmacy_name, #store_folder_id{
+    display:none;
+  }
+  
+  .button, #link_home{
+  	cursor: pointer; /* "hand" cursor */
+    border-color: #b10107;
+    color: #b10107;
+    margin: 0;
+    padding: 16px 20px;
+    border-radius: 1px;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    font-weight: 400;
+    font-size: 16px;
+    min-width: 142px;
+    outline: none;
+  }
+  
+  body{
+      font-family:'Helvetica', 'Arial', sans-serif;;
+      color: #292828;
+           font-size:16px;
+      background-color: #f4f5f7;
+
+  }
+  
+  #full_form{
+    visibility:hidden;
+   border: 1px solid #918c8d;
+   min-height:550px;
+    background-color:  white;
+    padding:15px;
+
+  }
+  
+  #header{
+    text-align:center;
+  }
+  
+  #title{
+    display:inline-block;
+    margin-top:10px;
+  }
+  
+  img{
+    float:left;
+    border-radius:100px;
+  }
+  
+  #link_home{
+    float:right;
+    border-radius:8px;
+    font-weight:bold;
+  }
+  
+  a{
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  #relevant_page{
+    width:60%;
+    border: 0.5px solid #918c8d;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+    padding:40px;
+    position:relative;
+    margin-left:auto;
+    margin-right:auto;
+    background-color:white;
+  }
+  
+  select {
+     background: transparent;
+  }
+  
+  #title{
+    font-size:30px;
+      font-weight:light;
+  }
+  
+  #login-result{
+     font-weight: bold;
+  }
+  
+  #login-email{
+    width: 250px;
+  }
+  
+  #login-email,#contact_name,#location, #manual_pharmacy_name{
+     border: 0;
+     border-bottom: 2px solid #767777;
+     font-size:14px;
+     line-height: 16px;
+     height: 30px;
+     text-align: center;
+     padding: 10px;
+     background: transparent;
+     color: darkred;
+   }
+
+   #supplies{
+     text-align:left;
+     font-weight: bold;
+   }
+
+   #supplies_wrapper, #supplies, #submit_wrapper{
+     text-align:left;
+   }
+
+   
+   #name_wrapper, #criteria-text{
+     padding-left:20px;
+     text-align:left;
+   }
+   
+   #contact_name, #supplies_table, #submit_button{
+     margin:auto;
+   }
+   
+   #west_coast_supplies_table,#east_coast_supplies_table{
+     display:none;
+     margin:auto;
+   }
+       
+  .required_text{
+    color:red;
+    display: none;
+  }
+  
+  
+  #box_count_tag, #box_size_tag, #east_label_tag,   #west_label_tag, #west_box_tag{
+    padding-right: 20px;
+    padding-top:10px;
+
+  }
+
+  #upload_text{
+    font-weight: bold;
+  }
+
+  #upload_button{
+    padding-left: 20px;
+  }
+  
+</style>
+
+</head>
+
+<script
+src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
+</script>
+
+ <div id="header">
+      <img height="40px" src="https://www.sirum.org/wp-content/uploads/2014/06/SIRUM_Enfold_Logo_40px.png">
+       
+</div>
+<br>
+<br>
+
+
+<body>
+   
+    <div id="relevant_page">
+    <div id="title">SIRUM Pickup Form</div><br><br>
+      <div id="welcome_greeting">Thanks for preparing your SIRUM shipment!
+        <br><br>Please enter your email address below to submit a pickup request.</div>
+        <br>
+      <div id = "sign-in" display="inline">
+        <input id="login-email" type="text" placeholder="Enter your Email" required/>
+        <input class="button" id="login_button" type="submit" value="Log In" 
+                   onclick="if(document.getElementById('login-email').value.length == 0){
+                               document.getElementById('login-email').placeholder = 'Please enter an Email Address'
+                               return false;
+                            } else {
+                               document.getElementById('email_required_text').style.display = 'none';
+                               this.value='Logging In';
+                            }
+                            google.script.run.withSuccessHandler(displayForm).logIn(document.getElementById('login-email').value);">
+         <div class="required_text" id="email_required_text">Please enter your email address</div>
+
+      </div>
+      
+      <br>
+      
+      <form id="full_form" >
+          <div id="login-result"></div>
+          <div id="store_pharmacy_name"></div>
+          <div id="store_folder_id"></div>
+          <input type="text" id="manual_pharmacy_name" placeholder= "Facility Name">
+          <div class="required_text" id="pharmacy_name_required_text">Please specify the facility name</div>
+          
+          <br><br><br>
+  
+          <div id="name_explanation">*Type your FULL NAME to confirm that your drugs have been properly stored in accordance with 
+          the manufacturer’s recommendations.
+          
+          <br><br>
+          
+          <div id="name_wrapper"><input type="text" id="contact_name" name="contact_name" placeholder="Your Name"/><br>
+          <div class="required_text" id="signature_required_text">Please complete this field</div>
+
+          </div>
+
+          </div>
+          
+          <br><br><br>
+          
+          
+          <div id="supplies_wrapper">
+          <div id="supplies"><i>Optional</i>: Let us know which supplies, if any, you need us to replenish:</div>
+            <br><br>
+            
+            <table id = "east_coast_supplies_table">
+              <tr>
+                <td id="box_count_tag">Number of Boxes</td>
+                <td><select name="box_count_options" id="box_count_options"></select></td>
+              </tr>
+              <tr>
+                <td id="box_size_tag">Box Size</td>
+                <td><select name="box_size_options" id="box_size_options"></select></td>
+              </tr>
+              <tr>
+                <td id="east_label_tag">Number of Shipping Labels</td>
+                <td><select name="east_label_options" id="east_label_options"></select></td>
+              </tr>
+            </table>
+            
+            <table id = "west_coast_supplies_table">
+              <tr>
+                <td id="west_box_tag">Boxes</td>
+                <td><select name="west_box_options" id="west_box_options"></select></td>
+              </tr>
+              <tr>
+                <td id="west_label_tag">Number of Shipping Labels</td>
+                <td><select name="west_label_options" id="west_label_options"></select></td>
+              </tr>
+            </table>
+            
+            <div class="required_text" id="both_boxes_required">Please specify both size and number of boxes</div>
+          </div>
+          
+          <div id="upload-options">
+            <div id= "upload_text"></div>
+            <br>
+            <div id="upload_button"><input type="file" name="myFile" id="file" class="inputfile" /></div>
+          </div>
+          
+          <div class="required_text" id="upload_required">Please select a donation record file</div>
+
+          <br><br>
+          <div id="submit_wrapper">
+          <input class="button" id="submit_button" type="submit" value="Submit" 
+                     onclick="var saved = saveData();
+                              if(saved){
+                                this.value = 'Submitting....'
+                                google.script.run.withSuccessHandler(fileUploaded).uploadFiles(document.getElementById('full_form'))
+                              }
+                              return false;">
+          </div>
+      </form>
+   </div>
+</body>
+
+<script>
+
+          //This is all the browser-side code that runs to keep the web-page alive & well. This is Javascript
+          
+          //Handles log-in results: facility,must_upload, state
+          function displayForm(log_in_results){
+            
+            //the user map gives an array for each email, with the pharmacy name + whether they need a record
+            if(log_in_results.length > 0){ //give them the pharmacy they're under, and any specific info
+
+              document.getElementById('store_pharmacy_name').innerHTML = log_in_results[0] //store this here for other elements to read
+              document.getElementById('manual_pharmacy_name').style.display = 'none'
+              document.getElementById('login-result').innerHTML = 'Your Pharmacy: ' + log_in_results[0]; 
+              
+              if(log_in_results[1]){ //if they require an upload
+                
+                document.getElementById('upload_text').innerHTML = '<br><br><br>*Please select and upload your donation record';
+                document.getElementById('upload-options').style.display = 'inline';
+                
+              } else {
+                document.getElementById('upload-options').style.display = 'none';
+              }
+              
+              google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions(log_in_results[2])
+
+                          
+            } else { //then we don't have their email
+            
+              document.getElementById('login-result').innerHTML = '*Looks like we do not have your email in our system. Please enter your facility name:';
+              document.getElementById('manual_pharmacy_name').style.display = 'inline';
+              document.getElementById('upload_text').innerHTML = '<br><br><br><i>If your facility requires</i>: Select and upload your donation record';
+              document.getElementById('upload-options').style.display = 'inline'; 
+              
+              google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions([])
+
+            }
+            
+          }
+          
+          
+          //Temporary new version of buildOptions
+          function buildOptions(supplies){
+            
+            if(supplies.length == 3){ //then its east coast
+                console.log("east coast")
+                document.getElementById('east_coast_supplies_table').style.display = 'inline'
+             
+                var box_count_options = $('#box_count_options');
+                var box_size_options = $('#box_size_options');
+                var label_options = $('#east_label_options');
+             
+             
+                for (var i = 0; i < supplies[0].length; i++) { //build boxes count dropdown
+                  box_count_options.append("<option value='" + supplies[0][i] + "'>" + supplies[0][i] + '</option>');
+                }
+             
+                for (var i = 0; i < supplies[1].length; i++) { //build boxes size dropdown
+                  box_size_options.append("<option value='" + supplies[1][i] + "'>" + supplies[1][i] + '</option>');
+                }
+             
+                for(var i = 0; i < supplies[2].length; i++){
+                  label_options.append("<option value='" + supplies[2][i] + "'>" + supplies[2][i] + '</option>');
+                }
+            
+            } else{ //then its west coast, and this is also our default
+            
+                console.log("west coast")
+                document.getElementById('west_coast_supplies_table').style.display = 'inline'
+
+                var box_options = $('#west_box_options');
+                var label_options = $('#west_label_options');
+             
+             
+                for (var i = 0; i < supplies[0].length; i++) { //build boxes count dropdown
+                  box_options.append("<option value='" + supplies[0][i] + "'>" + supplies[0][i] + '</option>');
+                }
+             
+                for (var i = 0; i < supplies[1].length; i++) { //build boxes size dropdown
+                  label_options.append("<option value='" + supplies[1][i] + "'>" + supplies[1][i] + '</option>');
+                }
+            }
+            
+            document.getElementById('welcome_greeting').style.display = 'none'
+            document.getElementById('login_button').style.display = 'none'
+            document.getElementById('full_form').style.minHeight = '0px'; //make the rest of the page visible
+
+            document.getElementById('full_form').style.visibility = 'visible'; //make the rest of the page visible
+            
+            
+          }
+          
+
+
+
+          
+          //Process form data and send it to server side function saveFormData
+          function saveData(){
+            
+            var name = document.getElementById("contact_name").value
+            
+            if(!name){
+              document.getElementById('signature_required_text').style.display = 'inline';
+              return false
+            } else {
+              document.getElementById('signature_required_text').style.display = 'none';
+            }
+            
+            var auto_pharmacy_name = document.getElementById('store_pharmacy_name').innerHTML //if they matched
+            var manual_pharmacy_name = document.getElementById("manual_pharmacy_name").value //if they entered manually
+            
+            if(!(auto_pharmacy_name || manual_pharmacy_name)){
+              document.getElementById('pharmacy_name_required_text').style.display = 'inline';
+              return false
+            } else {
+              document.getElementById('pharmacy_name_required_text').style.display = 'none';
+
+            }
+            
+            var pharmacy_name = auto_pharmacy_name ? auto_pharmacy_name: manual_pharmacy_name 
+            //var alert_unfound_pharamcy = auto_pharmacy_name ? false : true
+            
+            var email = document.getElementById("login-email").value //already forced this earlier
+            
+            if(document.getElementById('east_coast_supplies_table').style.display == 'inline'){ //then save east-coast
+               
+              var box_count = document.getElementById('box_count_options').value == 'None' ? '' : document.getElementById('box_count_options').value
+              var box_size = document.getElementById('box_size_options').value == 'None' ? '' : document.getElementById('box_size_options').value
+            
+              if(((box_count.length > 0) & (box_size.length == 0)) || ((box_count.length == 0) & (box_size.length > 0))){
+                document.getElementById('both_boxes_required').style.display = 'inline';
+                return false
+              } else {
+                document.getElementById('both_boxes_required').style.display = 'none';
+              }
+            
+              var label_count = document.getElementById('east_label_options').value == 'None' ? '' : document.getElementById('east_label_options').value
+            
+              var supplies = ""
+              if(box_count){
+                var temp = box_size.split(" (")
+                supplies = box_count + " " + temp[0] + " Boxes (" + temp[1] + ";"
+              }
+              
+              if(label_count){
+                supplies += label_count + " labels" 
+              }
+            
+            } else { //then save west coast
+            
+              var box_choice = document.getElementById('west_box_options').value == 'None' ? '' : document.getElementById('west_box_options').value
+              var label_choice = document.getElementById('west_label_options').value == 'None' ? '' : document.getElementById('west_label_options').value
+              
+              supplies = ""
+              if(box_choice){
+                supplies += box_choice + ";"
+              }
+              if(label_choice){
+                supplies += label_choice + " labels"
+              }
+
+            }
+
+
+
+            
+            if(document.getElementById('upload_text').innerHTML.indexOf('*') > -1){
+              if(document.getElementById('file').value.length == 0){
+                document.getElementById('upload_required').style.display = 'inline';
+                return false;
+              } else {
+                document.getElementById('upload_required').style.display = 'none';
+              }
+            }
+            
+
+            google.script.run.saveFormData([email,name,pharmacy_name,supplies]); 
+            return true;
+          }
+          
+          
+
+          //Print success message after file submitted
+          function fileUploaded(status) {
+                  document.getElementById('full_form').style.display = 'none';
+                  document.getElementById('sign-in').style.display = 'none';
+                  document.getElementById('welcome_greeting').style.display = 'inline'
+                  document.getElementById('welcome_greeting').innerHTML = status + '<br><br>Reload page to resubmit';
+          }
+          
+          
+</script> 
+
+</html>
+
