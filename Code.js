@@ -88,7 +88,7 @@ function saveFormData(arr){
     arr.unshift("ROWS NOT LINES UP")
     sheet.appendRow(arr)
   } else {
-    sheet.getRange("C" + last_row + ":F" + last_row).setValues([arr.slice(1)])
+    sheet.getRange("C" + last_row + ":G" + last_row).setValues([arr.slice(1)])
   }
   
   SpreadsheetApp.flush()
@@ -107,7 +107,7 @@ function uploadFiles(form) {
     var folder = null;
     var entries = SpreadsheetApp.openById(serverID()).getSheetByName("Form Entries")
     var last_row = entries.getLastRow()
-    var folder_id = entries.getRange("G" + last_row).getValue().toString()
+    var folder_id = entries.getRange("H" + last_row).getValue().toString()
     
     if(folder_id.length > 0){
       folder = DriveApp.getFolderById(folder_id)

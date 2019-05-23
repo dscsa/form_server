@@ -111,7 +111,7 @@
     width: 250px;
   }
   
-  #login-email,#contact_name,#location, #manual_pharmacy_name{
+  #login-email,#contact_name,#location, #manual_pharmacy_name, #num_donations{
      border: 0;
      border-bottom: 2px solid #767777;
      font-size:14px;
@@ -123,7 +123,7 @@
      color: darkred;
    }
 
-   #supplies{
+   #supplies, #num_donations_text{
      text-align:left;
      font-weight: bold;
    }
@@ -133,12 +133,12 @@
    }
 
    
-   #name_wrapper, #criteria-text{
+   #name_wrapper, #criteria-text, #num_donations_wrapper, #pharm_name_wrapper{
      padding-left:20px;
      text-align:left;
    }
    
-   #contact_name, #supplies_table, #submit_button{
+   #contact_name, #supplies_table, #submit_button, #num_donations{
      margin:auto;
    }
    
@@ -211,24 +211,24 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
           <div id="login-result"></div>
           <div id="store_pharmacy_name"></div>
           <div id="store_folder_id"></div>
-          <input type="text" id="manual_pharmacy_name" placeholder= "Facility Name">
+          <div id="pharm_name_wrapper"><input type="text" id="manual_pharmacy_name" placeholder= "Facility Name"></div>
           <div class="required_text" id="pharmacy_name_required_text">Please specify the facility name</div>
           
-          <br><br><br>
+          <br><br>
   
           <div id="name_explanation">*Type your FULL NAME to confirm that your drugs have been properly stored in accordance with 
-          the manufacturer’s recommendations.
+          the manufacturer’s recommendations.</div>
           
-          <br><br>
+          <br>
           
           <div id="name_wrapper"><input type="text" id="contact_name" name="contact_name" placeholder="Your Name"/><br>
-          <div class="required_text" id="signature_required_text">Please complete this field</div>
-
+              <div class="required_text" id="signature_required_text">Please complete this field</div>
           </div>
-
-          </div>
+          <br><br>
+          <div id="num_donations_text">*How many boxes are included in this donation? </div>
+          <div id="num_donations_wrapper"><input type="text" id="num_donations" name="num_donations" placeholder="1"/></div>
           
-          <br><br><br>
+          <br><br>
           
           
           <div id="supplies_wrapper">
@@ -448,7 +448,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
 
             }
 
-
+            var num_boxes = document.getElementById('num_donations').value.length == 0 ? "1" : document.getElementById('num_donations').value
 
             
             if(document.getElementById('upload_text').innerHTML.indexOf('*') > -1){
@@ -461,7 +461,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
             }
             
 
-            google.script.run.saveFormData([email,name,pharmacy_name,supplies]); 
+            google.script.run.saveFormData([email,name,pharmacy_name,supplies,num_boxes]); 
             return true;
           }
           
