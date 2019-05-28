@@ -20,7 +20,7 @@
     top: -1px;
   }
   
-  #manual_pharmacy_name, #store_pharmacy_name, #store_folder_id{
+  #manual_pharmacy_name, #store_pharmacy_name, #store_folder_id, .invisi_obj{
     display:none;
   }
   
@@ -210,6 +210,9 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
       <form id="full_form" >
           <div id="login-result"></div>
           <div id="store_pharmacy_name"></div>
+          
+          <input class = "invisi_obj" id = "file_upload_pre" type = "text" name = "pharmacy_name">
+          
           <div id="store_folder_id"></div>
           <div id="pharm_name_wrapper"><input type="text" id="manual_pharmacy_name" placeholder= "Facility Name"></div>
           <div class="required_text" id="pharmacy_name_required_text">Please specify the facility name</div>
@@ -224,10 +227,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
           <div id="name_wrapper"><input type="text" id="contact_name" name="contact_name" placeholder="Your Name"/><br>
               <div class="required_text" id="signature_required_text">Please complete this field</div>
           </div>
-          <br><br>
-          <div id="num_donations_text">*How many boxes are included in this donation? </div>
-          <div id="num_donations_wrapper"><input type="text" id="num_donations" name="num_donations" placeholder="1"/></div>
-          
+
           <br><br>
           
           
@@ -401,10 +401,11 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
               return false
             } else {
               document.getElementById('pharmacy_name_required_text').style.display = 'none';
-
             }
             
             var pharmacy_name = auto_pharmacy_name ? auto_pharmacy_name: manual_pharmacy_name 
+            document.getElementById('file_upload_pre').value = pharmacy_name
+
             //var alert_unfound_pharamcy = auto_pharmacy_name ? false : true
             
             var email = document.getElementById("login-email").value //already forced this earlier
@@ -448,7 +449,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
 
             }
 
-            var num_boxes = document.getElementById('num_donations').value.length == 0 ? "1" : document.getElementById('num_donations').value
+            //var num_boxes = 1 //If ever want to return to old approach: document.getElementById('num_donations').value.length == 0 ? "1" : document.getElementById('num_donations').value
 
             
             if(document.getElementById('upload_text').innerHTML.indexOf('*') > -1){
@@ -461,7 +462,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
             }
             
 
-            google.script.run.saveFormData([email,name,pharmacy_name,supplies,num_boxes]); 
+            google.script.run.saveFormData([email,name,pharmacy_name,supplies]); 
             return true;
           }
           

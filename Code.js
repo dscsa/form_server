@@ -82,6 +82,8 @@ function saveFormData(arr){
   var sheet = SpreadsheetApp.openById(serverID()).getSheetByName("Form Entries")
   var data = sheet.getDataRange().getValues()
   var last_row = sheet.getLastRow()
+  
+  arr.push('')
   arr.push(Utilities.formatDate(new Date(), "GMT-04:00", "MM/dd/yyyy HH:mm:ss"))
 
   if(data[last_row-1][1].toString().toLowerCase() != arr[0].toLowerCase()){ //then add a whole new row
@@ -116,12 +118,19 @@ function uploadFiles(form) {
     }
 
     
-    var blob = form.myFile;    
+    var blob = form.myFile;   
+    var filename = ""
+
     if(blob.getName().trim().length > 0){
+      filename = form.pharmacy_name + " ; " + blob.getName().trim()
+      
       var file = folder.createFile(blob);    
       file.setDescription("Uploaded by " + form.contact_name);
-      
+      file.setName(filename)
     }
+    
+    entries.getRange("F" + last_row).setValue(filename) //note the filename for bertha integraiton part
+
     return "Thank you! We'll schedule a FedEx Ground pickup for the next business day."
     
   } catch (error) {

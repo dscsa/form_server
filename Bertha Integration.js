@@ -16,7 +16,8 @@ function updateBertha(){
   var indexName = 2
   var indexFacility = 3
   var indexSupplies = 4
-  var indexNumBoxes = 5
+  var indexFilename = 5
+  var indexFolderId = 7
   var indexBerthaSent = 8
   
   var timestamp = Utilities.formatDate(new Date(), "GMT-04:00", "MM/dd/yyyy HH:mm:ss")
@@ -26,18 +27,26 @@ function updateBertha(){
         if(data[i][indexName].toString().trim().length > 0){ //only look at submitted rows
 
           if(data[i][indexFlag].toString().trim() == "FACILITY NOT FOUND"){
-            message = "Facility: PHARMACY FORM ENTERED: " + data[i][indexFacility]
-            message += "\nNumber Of Boxes: " + data[i][indexNumBoxes].toString().trim() + "\n"
+            message = "Facility: PHARMACY FORM ENTERED: " + data[i][indexFacility] + "\nNumber Of Boxes: 1\n"
             message += "Contact: " + data[i][indexName].toString() + " ----- " + data[i][indexEmail] + "\n"
 
           } else {
-            message = "Facility: " + data[i][indexFacility] 
-            message += "\nNumber Of Boxes: " + data[i][indexNumBoxes].toString().trim() + "\n"
+            message = "Facility: " + data[i][indexFacility] + "\nNumber Of Boxes: 1\n"
             message += "Contact: " + data[i][indexName].toString() + "\n"
           }
           
-          message += "Supplies: " + data[i][indexSupplies].toString() + "\nEND"
-    
+          message += "Supplies: " + data[i][indexSupplies].toString() + "\n"
+          
+          var uploadName = data[i][indexFilename].toString().trim()
+          
+          if(uploadName.length > 0){
+            if(data[i][indexFolderId].toString().trim().length == 0) uploadName = "<NO FOLDER ID> " + uploadName;
+            message += "Records Filename:" + uploadName + "\n";
+          }
+          
+          message += "END"
+          
+          
           if(num_emails < email_num_limit){
             MailApp.sendEmail(recipient,subject,message) //TODO switch to use 'recipient'
             num_emails += 1
