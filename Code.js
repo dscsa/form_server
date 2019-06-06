@@ -7,8 +7,9 @@ function doGet(e) {
 
 
 
-
-function logIn(email){
+//Handles logging in
+//If supplies only, flags appropriately for down-the-line workflow
+function logIn(email, supplies_only){
   //Takes the email, if it matches, returns relavant info, otherwise returns null
   var sh = SpreadsheetApp.openById(serverID())
   
@@ -17,7 +18,8 @@ function logIn(email){
   for(var i = 1; i < data.length; i++){
     var row_email = data[i][0].toString().toLowerCase()
     if((row_email.length > 0) && (row_email == email.trim())){
-      sh.getSheetByName("Form Entries").appendRow(["",row_email,"","","","", data[i][3]]) //make note of email, folderID
+      var flag = supplies_only ? "SUPPLY REQUEST" : ""
+      sh.getSheetByName("Form Entries").appendRow([flag,row_email,"","","","", data[i][3]]) //make note of email, folderID
       return [data[i][1],data[i][2], data[i][4]]
     }
   }

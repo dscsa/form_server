@@ -47,7 +47,7 @@
 
   }
   
-  #full_form{
+  #full_form, #form_border{
     visibility:hidden;
    border: 1px solid #918c8d;
    min-height:550px;
@@ -197,16 +197,21 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
                                document.getElementById('login-email').placeholder = 'Please enter an Email Address'
                                return false;
                             } else {
-                               document.getElementById('email_required_text').style.display = 'none';
                                this.value='Logging In';
                             }
-                            google.script.run.withSuccessHandler(displayForm).logIn(document.getElementById('login-email').value);">
-         <div class="required_text" id="email_required_text">Please enter your email address</div>
-
+                            google.script.run.withSuccessHandler(displayForm).logIn(document.getElementById('login-email').value, false);">
+        <input class="button" id="supply_request_button" type="submit" value="Request Supplies"
+                  onclick="if(document.getElementById('login-email').value.length == 0){
+                               document.getElementById('login-email').placeholder = 'Please enter an Email Address'
+                               return false;
+                            } else {
+                               this.value='Accessing';
+                            }
+                            google.script.run.withSuccessHandler(displaySupplies).logIn(document.getElementById('login-email').value, true);">
       </div>
       
       <br>
-      
+      <div id="form_border">
       <form id="full_form" >
           <div id="login-result"></div>
           <div id="store_pharmacy_name"></div>
@@ -283,6 +288,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
                               return false;">
           </div>
       </form>
+    </div>
    </div>
 </body>
 
@@ -325,6 +331,22 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
             
           }
           
+          
+          function displaySupplies(log_in_results){
+            if(log_in_results.length > 0){ //display appropriate supply options
+              
+              document.getElementById('store_pharmacy_name').innerHTML = log_in_results[0] //store this here for other elements to read
+              document.getElementById('login-result').innerHTML = 'Your Pharmacy: ' + log_in_results[0]; 
+              
+              google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions(log_in_results[2])
+
+            } else { //display default supply options
+            
+              google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions([])
+              
+            }
+            
+          }
           
           //Temporary new version of buildOptions
           function buildOptions(supplies){
@@ -370,9 +392,26 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
             
             document.getElementById('welcome_greeting').style.display = 'none'
             document.getElementById('login_button').style.display = 'none'
-            document.getElementById('full_form').style.minHeight = '0px'; //make the rest of the page visible
+            document.getElementById('supply_request_button').style.display = 'none'
 
-            document.getElementById('full_form').style.visibility = 'visible'; //make the rest of the page visible
+            if(document.getElementById('supply_request_button').value == 'Accessing'){ //then it's just for supply requests
+              document.getElementById('form_border').style.visibility = 'visible'
+              document.getElementById('name_explanation').innerHTML = 'Who will receive the supplies?'
+              document.getElementById('name_explanation').style.visibility = 'visible'
+              document.getElementById('supplies').innerHTML = 'Supplies options:'
+              document.getElementById('supplies').style.visibility = 'visible'
+              
+              document.getElementById("contact_name").placeholder = 'Name and/or Location';
+              document.getElementById("contact_name").style.visibility = 'visible';
+              
+              document.getElementById('supplies_wrapper').style.visibility = 'visible';
+              document.getElementById('submit_wrapper').style.visibility = 'visible';
+            } else { //then its full form
+              document.getElementById('full_form').style.minHeight = '0px'; //make the rest of the page visible
+
+              document.getElementById('full_form').style.visibility = 'visible'; //make the rest of the page visible
+            }
+
             
             
           }
