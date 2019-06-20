@@ -7,6 +7,8 @@ function doGet(e) {
 
 //Handles logging in
 //If supplies only, flags appropriately for down-the-line workflow
+//adds row here to start with so that we know if somebody logged in and didn't complete, 
+//in case of issue
 function logIn(email, supplies_only){
   
   //Takes the email, if it matches, returns relavant info, otherwise returns null
@@ -107,6 +109,8 @@ function saveFormData(just_supplies,arr){
 
 
 
+
+//Used in saveData and uploadFile to tag the appropriate rows
 function findRow(sheet,just_supplies,email){
   var data = sheet.getDataRange().getValues()
   var row = -1
