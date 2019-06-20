@@ -1,14 +1,14 @@
 
 //Run every minute to send an email to Bertha system, which'll process it to log new row
 function updateBertha(){
-  var recipient = berthaEmail()
-  var debug_email = debugEmail()
+  var recipient = BERTHA_EMAIL
+  var debug_email = DEBUG_EMAIL
   var subject = "Auto-Log API: Log Donation"
   var message = ""
   var email_num_limit = 20; //because there should be no instance of more than 20 emails at once (catches a weird bug still tbd from 9/28 where it created a new column)  
   var num_emails = 0;
   
-  var sheet = SpreadsheetApp.openById(serverID()).getSheetByName('Form Entries')
+  var sheet = SpreadsheetApp.openById(SERVER_ID).getSheetByName('Form Entries')
   var data = sheet.getDataRange().getValues()
 
   var indexFlag = 0
@@ -21,6 +21,8 @@ function updateBertha(){
   var indexBerthaSent = 8
   
   var timestamp = Utilities.formatDate(new Date(), "GMT-04:00", "MM/dd/yyyy HH:mm:ss")
+  
+  //TODO: edit the way it reads flag and handles rows that are just supply requests
   
   for(var i = 0; i < data.length; i++){
     if(data[i][indexBerthaSent].toString().trim().length == 0){ //only look at new rows 
@@ -48,7 +50,7 @@ function updateBertha(){
           
           
           if(num_emails < email_num_limit){
-            MailApp.sendEmail(recipient,subject,message) //TODO switch to use 'recipient'
+            MailApp.sendEmail(recipient,subject,message)
             num_emails += 1
           } else {
             MailApp.sendEmail(debug_email, "HIT EMAIL LIMIT", "PROBABLY A BUG, CHECK THIS OUT")
