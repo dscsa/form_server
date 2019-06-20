@@ -81,23 +81,47 @@ function getSuppliesOptions(state){
 
 
 
+
 //Takes data from form, if all fields correctly filled and saved to spreadsheet (like DB)
-function saveFormData(arr){
+function saveFormData(just_supplies,arr){
   var sheet = SpreadsheetApp.openById(SERVER_ID).getSheetByName("Form Entries")
-  var data = sheet.getDataRange().getValues()
-  var last_row = sheet.getLastRow()
+  
+  var row = findRow(sheet,just_supplies,arr[0])
   
   arr.push('')
   arr.push(Utilities.formatDate(new Date(), "GMT-04:00", "MM/dd/yyyy HH:mm:ss"))
 
-  if(data[last_row-1][1].toString().toLowerCase() != arr[0].toLowerCase()){ //then add a whole new row
-    arr.unshift("ROWS NOT LINES UP")
-    sheet.appendRow(arr)
+  if(row > -1){
+    sheet.getRange("C" + (row+1) + ":G" + (row+1)).setValues([arr.slice(1)])
   } else {
-    sheet.getRange("C" + last_row + ":G" + last_row).setValues([arr.slice(1)])
+    //if here, there was an issue with lining up rows
+    var error_txt = just_supplies ? 'SUPPLY REQUEST - ': 
+    arr.unshift(error_txt + "ROWS NOT LINES UP")
+    sheet.appendRow(arr)
   }
   
   SpreadsheetApp.flush()
+  
+}
+
+
+
+
+function findRow(sheet,just_supplies,email){
+  var data = sheet.getDataRange().getValues()
+  var row = -1
+
+  for(var i = data.length-1; i > data.length - 10; i--){ //check 10 last rows, this helps with concurrency issue, but no reason there should be that much of it
+
+    if(just_supplies == (data[i][0].toString().indexOf('SUPPLY') > -1)){
+        if((data[i][1].toString().trim().toLowerCase() == email.trim().toLowerCase())){
+          return i
+        }
+    }
+    
+  }
+  return row
+  
 }
 
 
@@ -109,8 +133,9 @@ function uploadFiles(form) {
     
     var folder = null;
     var entries = SpreadsheetApp.openById(SERVER_ID).getSheetByName("Form Entries")
-    var last_row = entries.getLastRow()
-    var folder_id = entries.getRange("H" + last_row).getValue().toString()
+    var row = findRow(entries,false,form.user_email)
+    
+    var folder_id = entries.getRange("H" + (row+1)).getValue().toString()
     
     if(folder_id.length > 0){
       folder = DriveApp.getFolderById(folder_id)
@@ -130,7 +155,7 @@ function uploadFiles(form) {
       file.setName(filename)
     }
     
-    entries.getRange("F" + last_row).setValue(filename) //note the filename for bertha integraiton part
+    entries.getRange("F" + (row+1)).setValue(filename) //note the filename for bertha integraiton part
 
     return "Thank you! We'll schedule a FedEx Ground pickup for the next business day."
     

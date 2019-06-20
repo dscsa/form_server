@@ -218,7 +218,8 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
           <div id="store_pharmacy_name"></div>
           
           <input class = "invisi_obj" id = "file_upload_pre" type = "text" name = "pharmacy_name">
-          
+          <input class = "invisi_obj" id = "form_email_field" type = "text" name = "user_email">
+
           <div id="store_folder_id"></div>
           <div id="pharm_name_wrapper" class = "visible_for_supplies"><input type="text" id="manual_pharmacy_name" placeholder= "Facility Name AND City"></div>
           <div class="required_text" id="pharmacy_name_required_text">Please specify the facility name</div>
@@ -454,11 +455,12 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
             } else {
               document.getElementById('pharmacy_name_required_text').style.display = 'none';
             }
-            
+            var email = document.getElementById("login-email").value //already forced this earlier
+
             var pharmacy_name = auto_pharmacy_name ? auto_pharmacy_name: manual_pharmacy_name 
             document.getElementById('file_upload_pre').value = pharmacy_name //saving it this way allows server code to handle
-
-            var email = document.getElementById("login-email").value //already forced this earlier
+            document.getElementById('form_email_field').value = email
+            
             
             if(document.getElementById('east_coast_supplies_table').style.display == 'inline'){ //then save east-coast
                
@@ -511,8 +513,8 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
               }
             }
             
-
-            google.script.run.saveFormData([email,name,pharmacy_name,supplies]); 
+            var just_supplies = document.getElementById('supply_request_button').value == 'Accessing'
+            google.script.run.saveFormData(just_supplies,[email,name,pharmacy_name,supplies]); 
             return true;
           }
           
