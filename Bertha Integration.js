@@ -28,12 +28,18 @@ function updateBertha(){
     if(data[i][indexBerthaSent].toString().trim().length == 0){ //only look at new rows 
         if(data[i][indexName].toString().trim().length > 0){ //only look at submitted rows
 
-          if(data[i][indexFlag].toString().trim() == "FACILITY NOT FOUND"){
-            message = "Facility: PHARMACY FORM ENTERED: " + data[i][indexFacility] + "\nNumber Of Boxes: 1\n"
+          var flag = data[i][indexFlag].toString().trim()
+          
+          var num_boxes = (~ flag.indexOf('SUPPLY')) ? '0' : '1'
+          
+          
+          if(~ data[i][indexFlag].toString().indexOf("FACILITY NOT FOUND")){
+            
+            message = "Facility: PHARMACY FORM ENTERED: " + cleanFacility(data[i][indexFacility]) + "\nNumber Of Boxes: " + num_boxes + "\n"
             message += "Contact: " + data[i][indexName].toString() + " ----- " + data[i][indexEmail] + "\n"
 
           } else {
-            message = "Facility: " + data[i][indexFacility] + "\nNumber Of Boxes: 1\n"
+            message = "Facility: " + cleanFacility(data[i][indexFacility]) + "\nNumber Of Boxes: " + num_boxes + "\n"
             message += "Contact: " + data[i][indexName].toString() + "\n"
           }
           
@@ -61,4 +67,8 @@ function updateBertha(){
         }
     }
   }
+}
+
+function cleanFacility(raw){
+  return raw.replace(/&amp;/g,'&')
 }
