@@ -20,7 +20,7 @@
     top: -1px;
   }
   
-  #manual_pharmacy_name, #store_pharmacy_name, #store_folder_id{
+  #manual_pharmacy_name, #store_pharmacy_name, #store_folder_id, .invisi_obj{
     display:none;
   }
   
@@ -47,7 +47,7 @@
 
   }
   
-  #full_form{
+  #full_form, #form_border{
     visibility:hidden;
    border: 1px solid #918c8d;
    min-height:550px;
@@ -188,52 +188,59 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
     <div id="relevant_page">
     <div id="title">SIRUM Pickup Form</div><br><br>
       <div id="welcome_greeting">Thanks for preparing your SIRUM shipment!
-        <br><br>Please enter your email address below to submit a pickup request.</div>
+        <br><br>Please enter your email address below to submit a request a pickup or supplies.</div>
         <br>
       <div id = "sign-in" display="inline">
         <input id="login-email" type="text" placeholder="Enter your Email" required/>
-        <input class="button" id="login_button" type="submit" value="Log In" 
+        <input class="button" id="login_button" type="submit" value="Request Pickup" 
                    onclick="if(document.getElementById('login-email').value.length == 0){
                                document.getElementById('login-email').placeholder = 'Please enter an Email Address'
                                return false;
                             } else {
-                               document.getElementById('email_required_text').style.display = 'none';
                                this.value='Logging In';
                             }
-                            google.script.run.withSuccessHandler(displayForm).logIn(document.getElementById('login-email').value);">
-         <div class="required_text" id="email_required_text">Please enter your email address</div>
-
+                            google.script.run.withSuccessHandler(displayForm).logIn(document.getElementById('login-email').value, false);">
+        
+        <input class="button" id="supply_request_button" type="submit" value="Request Supplies"
+                  onclick="if(document.getElementById('login-email').value.length == 0){
+                               document.getElementById('login-email').placeholder = 'Please enter an Email Address'
+                               return false;
+                            } else {
+                               this.value='Accessing';
+                            }
+                            google.script.run.withSuccessHandler(displaySupplies).logIn(document.getElementById('login-email').value, true);">
       </div>
       
       <br>
-      
+      <div id="form_border" class = "visible_for_supplies">
       <form id="full_form" >
-          <div id="login-result"></div>
+          <div id="login-result" class = "visible_for_supplies"></div>
           <div id="store_pharmacy_name"></div>
+          
+          <input class = "invisi_obj" id = "file_upload_pre" type = "text" name = "pharmacy_name">
+          <input class = "invisi_obj" id = "form_email_field" type = "text" name = "user_email">
+
           <div id="store_folder_id"></div>
-          <div id="pharm_name_wrapper"><input type="text" id="manual_pharmacy_name" placeholder= "Facility Name"></div>
+          <div id="pharm_name_wrapper" class = "visible_for_supplies"><input type="text" id="manual_pharmacy_name" placeholder= "Facility Name AND City"></div>
           <div class="required_text" id="pharmacy_name_required_text">Please specify the facility name</div>
           
           <br><br>
   
-          <div id="name_explanation">*Type your FULL NAME to confirm that your drugs have been properly stored in accordance with 
+          <div id="name_explanation" class = "visible_for_supplies">*Type your FULL NAME to confirm that your drugs have been properly stored in accordance with 
           the manufacturer’s recommendations.</div>
           
           <br>
           
-          <div id="name_wrapper"><input type="text" id="contact_name" name="contact_name" placeholder="Your Name"/><br>
-              <div class="required_text" id="signature_required_text">Please complete this field</div>
+          <div id="name_wrapper" class = "visible_for_supplies"><input type="text" id="contact_name" name="contact_name" placeholder="Your Name"/><br>
+              <div class="required_text" class = "visible_for_supplies" id="signature_required_text">Please complete this field</div>
           </div>
-          <br><br>
-          <div id="num_donations_text">*How many boxes are included in this donation? </div>
-          <div id="num_donations_wrapper"><input type="text" id="num_donations" name="num_donations" placeholder="1"/></div>
-          
+
           <br><br>
           
           
-          <div id="supplies_wrapper">
-          <div id="supplies"><i>Optional</i>: Let us know which supplies, if any, you need us to replenish:</div>
-            <br><br>
+          <div id="supplies_wrapper" class = "visible_for_supplies">
+          <div id="supplies" class = "visible_for_supplies"><i>Optional</i>: Let us know which supplies, if any, you need us to replenish:</div>
+            <br>
             
             <table id = "east_coast_supplies_table">
               <tr>
@@ -273,16 +280,22 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
           <div class="required_text" id="upload_required">Please select a donation record file</div>
 
           <br><br>
-          <div id="submit_wrapper">
+          <div id="submit_wrapper" class = "visible_for_supplies">
           <input class="button" id="submit_button" type="submit" value="Submit" 
                      onclick="var saved = saveData();
                               if(saved){
                                 this.value = 'Submitting....'
-                                google.script.run.withSuccessHandler(fileUploaded).uploadFiles(document.getElementById('full_form'))
+                                if(document.getElementById('supply_request_button').value == 'Accessing'){ //then it's just for supply requests
+                                  var status = 'Thank you! Your supplies will be arriving in 3-5 business days.'
+                                  successMessage(status)
+                                } else { //then we may need to upload
+                                  google.script.run.withSuccessHandler(successMessage).uploadFiles(document.getElementById('full_form'))
+                                }
                               }
                               return false;">
           </div>
       </form>
+    </div>
    </div>
 </body>
 
@@ -290,7 +303,8 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
 
           //This is all the browser-side code that runs to keep the web-page alive & well. This is Javascript
           
-          //Handles log-in results: facility,must_upload, state
+          
+          //Handles log-in results for pickup request: facility,must_upload, state
           function displayForm(log_in_results){
             
             //the user map gives an array for each email, with the pharmacy name + whether they need a record
@@ -300,25 +314,25 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
               document.getElementById('manual_pharmacy_name').style.display = 'none'
               document.getElementById('login-result').innerHTML = 'Your Pharmacy: ' + log_in_results[0]; 
               
-              if(log_in_results[1]){ //if they require an upload
+               if(log_in_results[1]){ //if they require an upload
                 
-                document.getElementById('upload_text').innerHTML = '<br><br><br>*Please select and upload your donation record';
-                document.getElementById('upload-options').style.display = 'inline';
+                  document.getElementById('upload_text').innerHTML = '<br><br><br>*Please select and upload your donation record';
+                  document.getElementById('upload-options').style.display = 'inline';
                 
-              } else {
-                document.getElementById('upload-options').style.display = 'none';
-              }
+               } else {
+                 document.getElementById('upload-options').style.display = 'none';
+               }
               
               google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions(log_in_results[2])
 
                           
             } else { //then we don't have their email
-            
-              document.getElementById('login-result').innerHTML = '*Looks like we do not have your email in our system. Please enter your facility name:';
-              document.getElementById('manual_pharmacy_name').style.display = 'inline';
-              document.getElementById('upload_text').innerHTML = '<br><br><br><i>If your facility requires</i>: Select and upload your donation record';
-              document.getElementById('upload-options').style.display = 'inline'; 
               
+                document.getElementById('login-result').innerHTML = 'Looks like we do not have your email in our system. Please enter your facility name AND city.';
+                document.getElementById('manual_pharmacy_name').style.display = 'inline';
+                document.getElementById('upload_text').innerHTML = '<br><br><br><i>If your facility requires</i>: Select and upload your donation record';
+                document.getElementById('upload-options').style.display = 'inline'; 
+                
               google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions([])
 
             }
@@ -326,7 +340,29 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
           }
           
           
-          //Temporary new version of buildOptions
+          //Handles log-in results for supply request
+          function displaySupplies(log_in_results){
+          
+            if(log_in_results.length > 0){ //display appropriate supply options
+              
+              document.getElementById('store_pharmacy_name').innerHTML = log_in_results[0] //store this here for other elements to read
+              document.getElementById('login-result').innerHTML = 'Your Pharmacy: ' + log_in_results[0]; 
+
+              google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions(log_in_results[2])
+
+            } else { //display default supply options
+            
+              document.getElementById('login-result').innerHTML = 'Looks like we do not have your email in our system. Please enter your facility name AND city.';
+              document.getElementById('manual_pharmacy_name').style.display = 'inline'
+
+              google.script.run.withSuccessHandler(buildOptions).getSuppliesOptions([])
+              
+            }
+            
+          }
+          
+          
+
           function buildOptions(supplies){
             
             if(supplies.length == 3){ //then its east coast
@@ -368,26 +404,41 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
                 }
             }
             
+            //Dont show the login stuff / buttons anymore
             document.getElementById('welcome_greeting').style.display = 'none'
             document.getElementById('login_button').style.display = 'none'
-            document.getElementById('full_form').style.minHeight = '0px'; //make the rest of the page visible
+            document.getElementById('supply_request_button').style.display = 'none'
 
-            document.getElementById('full_form').style.visibility = 'visible'; //make the rest of the page visible
+            if(document.getElementById('supply_request_button').value == 'Accessing'){ //then it's just for supply requests
             
+              document.getElementById('title').innerHTML = 'SIRUM Supply Request Form'
+              document.getElementById('name_explanation').innerHTML = 'Who will receive the supplies?'
+              document.getElementById('supplies').innerHTML = 'Supplies options:'
+              document.getElementById("contact_name").placeholder = 'Name and/or Location';
+
+              Array.from(document.getElementsByClassName("visible_for_supplies")).forEach(function(element) { //display all the elements we only want for supplies
+                  element.style.visibility = 'visible';
+               });
+
             
+            } else { //then its full form
+              document.getElementById('full_form').style.minHeight = '0px'; //make the rest of the page visible
+              document.getElementById('full_form').style.visibility = 'visible'; //make the rest of the page visible
+            }
+
           }
           
-
-
 
           
           //Process form data and send it to server side function saveFormData
           function saveData(){
-            
+
             var name = document.getElementById("contact_name").value
             
             if(!name){
-              document.getElementById('signature_required_text').style.display = 'inline';
+              var req_text = document.getElementById('signature_required_text')
+              req_text.style.visibility = 'visible';
+              req_text.style.display = 'inline';
               return false
             } else {
               document.getElementById('signature_required_text').style.display = 'none';
@@ -397,17 +448,19 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
             var manual_pharmacy_name = document.getElementById("manual_pharmacy_name").value //if they entered manually
             
             if(!(auto_pharmacy_name || manual_pharmacy_name)){
-              document.getElementById('pharmacy_name_required_text').style.display = 'inline';
+              var req_text = document.getElementById('pharmacy_name_required_text')
+              req_text.style.visibility = 'visible';
+              req_text.style.display = 'inline';
               return false
             } else {
               document.getElementById('pharmacy_name_required_text').style.display = 'none';
-
             }
-            
-            var pharmacy_name = auto_pharmacy_name ? auto_pharmacy_name: manual_pharmacy_name 
-            //var alert_unfound_pharamcy = auto_pharmacy_name ? false : true
-            
             var email = document.getElementById("login-email").value //already forced this earlier
+
+            var pharmacy_name = auto_pharmacy_name ? auto_pharmacy_name: manual_pharmacy_name 
+            document.getElementById('file_upload_pre').value = pharmacy_name //saving it this way allows server code to handle
+            document.getElementById('form_email_field').value = email
+            
             
             if(document.getElementById('east_coast_supplies_table').style.display == 'inline'){ //then save east-coast
                
@@ -415,7 +468,9 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
               var box_size = document.getElementById('box_size_options').value == 'None' ? '' : document.getElementById('box_size_options').value
             
               if(((box_count.length > 0) & (box_size.length == 0)) || ((box_count.length == 0) & (box_size.length > 0))){
-                document.getElementById('both_boxes_required').style.display = 'inline';
+                var req_text = document.getElementById('both_boxes_required')
+                req_text.style.display = 'inline';
+                req_text.style.visibility = 'visible';
                 return false
               } else {
                 document.getElementById('both_boxes_required').style.display = 'none';
@@ -433,7 +488,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
                 supplies += label_count + " labels" 
               }
             
-            } else { //then save west coast
+           } else { //then save west coast
             
               var box_choice = document.getElementById('west_box_options').value == 'None' ? '' : document.getElementById('west_box_options').value
               var label_choice = document.getElementById('west_label_options').value == 'None' ? '' : document.getElementById('west_label_options').value
@@ -446,12 +501,10 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
                 supplies += label_choice + " labels"
               }
 
-            }
-
-            var num_boxes = document.getElementById('num_donations').value.length == 0 ? "1" : document.getElementById('num_donations').value
+           }
 
             
-            if(document.getElementById('upload_text').innerHTML.indexOf('*') > -1){
+           if(document.getElementById('upload_text').innerHTML.indexOf('*') > -1){
               if(document.getElementById('file').value.length == 0){
                 document.getElementById('upload_required').style.display = 'inline';
                 return false;
@@ -460,19 +513,20 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
               }
             }
             
-
-            google.script.run.saveFormData([email,name,pharmacy_name,supplies,num_boxes]); 
+            var just_supplies = document.getElementById('supply_request_button').value == 'Accessing'
+            google.script.run.saveFormData(just_supplies,[email,name,pharmacy_name,supplies]); 
             return true;
           }
           
           
 
-          //Print success message after file submitted
-          function fileUploaded(status) {
-                  document.getElementById('full_form').style.display = 'none';
-                  document.getElementById('sign-in').style.display = 'none';
-                  document.getElementById('welcome_greeting').style.display = 'inline'
-                  document.getElementById('welcome_greeting').innerHTML = status + '<br><br>Reload page to resubmit';
+          //Print success message after form submitted
+          function successMessage(status) {
+            document.getElementById('full_form').style.display = 'none';
+            document.getElementById('form_border').style.visibility = 'hidden' //may still be there for supply requests
+            document.getElementById('sign-in').style.display = 'none';
+            document.getElementById('welcome_greeting').style.display = 'inline'
+            document.getElementById('welcome_greeting').innerHTML = status + '<br><br>Reload page to resubmit';
           }
           
           
