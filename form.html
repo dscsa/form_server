@@ -481,7 +481,7 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
               var supplies = ""
               if(box_count){
                 var temp = box_size.split(" (")
-                supplies = box_count + " " + temp[0] + " Boxes (" + temp[1] + ";"
+                supplies = (temp.length == 2) ? (box_count + " " + temp[0] + " Boxes (" + temp[1] + ";") : (box_count + " " + temp[0] + ";")
               }
               
               if(label_count){
