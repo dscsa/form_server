@@ -35,28 +35,28 @@ function updateBertha(){
           
           if(~ data[i][indexFlag].toString().indexOf("FACILITY NOT FOUND")){
             
-            message = "Facility: PHARMACY FORM ENTERED: " + cleanFacility(data[i][indexFacility]) + "\nNumber Of Boxes: " + num_boxes + "\n"
-            message += "Contact: " + data[i][indexName].toString() + " ----- " + data[i][indexEmail] + "\n"
+            message = "Facility: PHARMACY FORM ENTERED: " + cleanFacility(data[i][indexFacility]) + "<br>Number Of Boxes: " + num_boxes + "<br>"
+            message += "Contact: " + data[i][indexName].toString() + " ----- " + data[i][indexEmail] + "<br>"
 
           } else {
-            message = "Facility: " + cleanFacility(data[i][indexFacility]) + "\nNumber Of Boxes: " + num_boxes + "\n"
-            message += "Contact: " + data[i][indexName].toString() + "\n"
+            message = "Facility: " + cleanFacility(data[i][indexFacility]) + "<br>Number Of Boxes: " + num_boxes + "<br>"
+            message += "Contact: " + data[i][indexName].toString() + "<br>"
           }
           
-          message += "Supplies: " + data[i][indexSupplies].toString() + "\n"
+          message += "Supplies: " + data[i][indexSupplies].toString() + "<br>"
           
           var uploadName = data[i][indexFilename].toString().trim()
           
           if(uploadName.length > 0){
             if(data[i][indexFolderId].toString().trim().length == 0) uploadName = "<NO FOLDER ID> " + uploadName;
-            message += "Records Filename:" + uploadName + "\n";
+            message += "Records Filename:" + uploadName + "<br>";
           }
           
           message += "END"
           
           
           if(num_emails < email_num_limit){
-            MailApp.sendEmail(recipient,subject,message)
+            MailApp.sendEmail(recipient,subject,'',{htmlBody:message})
             num_emails += 1
           } else {
             MailApp.sendEmail(debug_email, "HIT EMAIL LIMIT", "PROBABLY A BUG, CHECK THIS OUT")

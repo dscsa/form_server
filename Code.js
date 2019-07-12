@@ -22,7 +22,7 @@ function logIn(email, supplies_only){
     var row_email = data[i][0].toString().toLowerCase()
     
     if((row_email.length > 0) && (row_email == email.trim())){
-      sh.getSheetByName("Form Entries").appendRow([flag,row_email,"","","","", data[i][3]]) //make note of email, folderID
+      sh.getSheetByName("Form Entries").appendRow([flag,row_email,"","","","","", data[i][3]]) //make note of email, folderID
       return [data[i][1],data[i][2], data[i][4]]
     }
   
