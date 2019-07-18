@@ -415,10 +415,11 @@ src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">
               document.getElementById('name_explanation').innerHTML = 'Who will receive the supplies?'
               document.getElementById('supplies').innerHTML = 'Supplies options:'
               document.getElementById("contact_name").placeholder = 'Name and/or Location';
-
-              Array.from(document.getElementsByClassName("visible_for_supplies")).forEach(function(element) { //display all the elements we only want for supplies
-                  element.style.visibility = 'visible';
-               });
+              
+              var elems_to_display = document.getElementsByClassName("visible_for_supplies")
+              for(var i = 0; i < elems_to_display.length; i++){
+                 elems_to_display[i].style.visibility = 'visible'
+              }
 
             
             } else { //then its full form
